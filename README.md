@@ -14,9 +14,8 @@ Chatbot desenvolvido no n8n que informa a temperatura atual de cidades do Brasil
 - Conta no OpenWeather
 
 ## Variáveis de Ambiente
-Api key open weather: 619c231b7c11593ed259ebdf341b033b
-Telegran token:
-8274273430:AAFd3H30gjneawk5WgvEvvWzPA-ARNf-ifQn
+Api key open weather: OPENWEATHER_API_KEY
+Telegran token: TELEGRAN_API_TOKEN
 
 
 ## Importação
