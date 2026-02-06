@@ -1,0 +1,350 @@
+{
+  "name": "FTR | Chat telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f44b8553-ae52-4fc1-9067-f1c8fc7ff407",
+              "name": "queue",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "20b0b957-8bca-41df-a59b-f80b6b990615",
+              "name": "",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "65d954bd-26a1-4e43-a6f2-a1844103d4cc",
+              "name": "chatId",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1312,
+        320
+      ],
+      "id": "3314e423-7fd1-4e3a-b4d0-57ebddcedef0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3c165ed9-f721-4954-9841-4bb79aa0b259",
+              "name": "queue",
+              "value": "={{ $json.queue.trim().toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "0667398f-ae94-45cd-b0e2-1172aa03dc2b",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1104,
+        320
+      ],
+      "id": "785c6c20-afb6-40e9-8139-078f3bb62cb2",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "url": "https://api.openweathermap.org/data/2.5/weather",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.queue }}"
+            },
+            {
+              "name": "units",
+              "value": "metric"
+            },
+            {
+              "name": "lang",
+              "value": "pt_br"
+            },
+            {
+              "name": "appid",
+              "value": "=619c231b7c11593ed259ebdf341b033b"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -896,
+        320
+      ],
+      "id": "c793c0f8-c628-4824-9725-5949caeb0836",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9ce1e402-d3e5-4055-8160-433a236e84c8",
+              "leftValue": "=={{ $json.main.temp }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -688,
+        320
+      ],
+      "id": "a932245f-4f60-4b06-b933-8197b8d678d6",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fedabd49-dd8d-4863-8c7f-5179cdc12a3c",
+              "name": "message",
+              "value": "={{ \"A temperatura em \" + $json.name + \" é de \" + Math.round($json.main.temp) + \"°C.\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -480,
+        224
+      ],
+      "id": "e3290abb-3a13-43a4-a7b5-d44e9ad2f059",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "text": "={{ $json.message}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -272,
+        224
+      ],
+      "id": "fef2f43a-c651-4ebc-8894-eb699c02db12",
+      "name": "Send a text message",
+      "webhookId": "3f941a14-134e-4af4-9751-c3d73bccf252",
+      "credentials": {
+        "telegramApi": {
+          "id": "bAWrELoM4uej08uy",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f3a35ef4-3991-434c-aea4-a9864a293d96",
+              "name": "message",
+              "value": "Cidade não encontrada. Use o formato Cidade,UF (ex.: São Paulo,SP).",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -480,
+        416
+      ],
+      "id": "9b777d0e-a88a-4986-ab16-3a9c2c819d9b",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "chatId": "=={{ $node[\"Telegram Trigger\"].json.message.chat.id }}",
+        "text": "=={{ $json.message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -272,
+        416
+      ],
+      "id": "420c73b0-a15a-400c-958b-bdae79a9681f",
+      "name": "Send a text message1",
+      "webhookId": "1da57bf9-2f60-4157-bdb1-e816e9540d1c",
+      "credentials": {
+        "telegramApi": {
+          "id": "bAWrELoM4uej08uy",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1520,
+        320
+      ],
+      "id": "f570fd17-0725-44e9-9246-11a14237be76",
+      "name": "Telegram Trigger",
+      "webhookId": "5f6c9e98-2167-416e-b436-bc6e703effb0",
+      "credentials": {
+        "telegramApi": {
+          "id": "bAWrELoM4uej08uy",
+          "name": "Telegram account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "65084977-49e3-42fd-88f1-bc1d378ecf55",
+  "meta": {
+    "instanceId": "cee66275e39f48bcf04fa395ec2c531ef6f4e76afd6a3f0f603e64f70bb607a1"
+  },
+  "id": "GQojo2T0_nBJSWhmA8j_S",
+  "tags": []
+}
